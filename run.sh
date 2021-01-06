@@ -35,7 +35,7 @@ yes | pacman -Sy archlinux-keyring archlinuxarm-keyring parabola-keyring
 yes | pacman -U https://www.parabola.nu/packages/core/i686/archlinux32-keyring-transition/download/
 
 # Add our mirror to the top of the pacman's mirrorlist
-echo "$(awk -v "var=$MIRROR" '/^Server \= *./ && !x {print var; x=1} 1' /etc/pacman.d/mirrorlist)" > /etc/pacman.d/mirrorlist
+echo "$(awk -v "var=Server = $MIRROR" '/^Server \= *./ && !x {print var; x=1} 1' /etc/pacman.d/mirrorlist)" > /etc/pacman.d/mirrorlist
 
 # Install base packages and kernel
 pacstrap $CHROOTDIR $BASE_PACKAGES $KERNEL
