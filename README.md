@@ -17,4 +17,4 @@ The installation disk must be partitioned and an internet connection established
 The primary resource for troubleshooting should be either the [Parabola Wiki](https://wiki.parabola.nu/Main_Page) or [Arch Wiki](https://wiki.archlinux.org/).
 
 # Developer
-- [Foster Hangdaan](https://gitlab.com/FosterHangdaan)
+- [Foster Hangdaan](https://github.com/FosterHangdaan)
