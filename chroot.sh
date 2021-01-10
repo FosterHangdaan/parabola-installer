@@ -3,6 +3,18 @@
 cd $(dirname $0)
 source settings.cfg
 
+# Ensure that pacman is subscribed to the proper package repo
+# according to the chosen init system.
+if [[ $INIT_SYSTEM == 'systemd' ]]; then
+	# SystemD: Unsubscribe from nonsystemd repo
+	sed -i "s|^\[nonsystemd\]|#\[nonsystemd\]|" /etc/pacman.conf
+	sed -i "/\[nonsystemd\]/{n;s|^Include.*|#&|}" /etc/pacman.conf
+else
+	# OpenRC: Subscribe to nonsystemd repo
+	sed -i "s|^#\[nonsystemd\]|\[nonsystemd\]|" /etc/pacman.conf
+	sed -i "/\[nonsystemd\]/{n;s|^#||}" /etc/pacman.conf
+fi
+
 # Set hostname
 sed "s|HOSTNAME|${HOSTNAME}|" etc/hosts.txt >> /etc/hosts
 if [[ $INIT_SYSTEM == 'systemd' ]]; then
@@ -40,18 +52,6 @@ echo "Enter the password for user ${USERNAME}"
 passwd $USERNAME
 echo 'Enter the password for root'
 passwd root
-
-# Ensure that pacman is subscribed to the proper package repo
-# according to the chosen init system.
-if [[ $INIT_SYSTEM == 'systemd' ]]; then
-	# SystemD: Unsubscribe from nonsystemd repo
-	sed -i "s|^\[nonsystemd\]|#\[nonsystemd\]|" /etc/pacman.conf
-	sed -i "/\[nonsystemd\]/{n;s|^Include.*|#&|}" /etc/pacman.conf
-else
-	# OpenRC: Subscribe to nonsystemd repo
-	sed -i "s|^#\[nonsystemd\]|\[nonsystemd\]|" /etc/pacman.conf
-	sed -i "/\[nonsystemd\]/{n;s|^#||}" /etc/pacman.conf
-fi
 
 # Install grub bootloader 
 if [[ ! -d /boot/efi ]]; then
