@@ -40,6 +40,9 @@ if [[ $CRYPTDEVICES -ge 1 ]]; then
 	CRYPTUUID=$(lsblk -o 'NAME,FSTYPE,UUID' | grep "$BLKDEV" | grep 'crypto_LUKS' | awk '{print $3}')
 	sed -i "s|^HOOKS=\(.*\)|HOOKS=\(base udev autodetect keyboard keymap consolefont modconf block encrypt filesystems fsck\)|" /etc/mkinitcpio.conf
 	sed -i "s|^GRUB_CMDLINE_LINUX_DEFAULT=\".*\"|GRUB_CMDLINE_LINUX_DEFAULT=\"loglevel=3 quiet cryptdevice=UUID=${CRYPTUUID}:cryptroot root=/dev/mapper/cryptroot\"|" /etc/default/grub
+
+	# Cryptsetup is required for encryption hooks. Ensure that it is installed.
+	pacman -Qi cryptsetup 1>/dev/null 2>&1 || { yes | pacman -S cryptsetup ; }
 fi
 
 # Generate boot disk
