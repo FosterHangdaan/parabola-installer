@@ -53,9 +53,6 @@ else
 	sed -i "/\[nonsystemd\]/{n;s|^#||}" /etc/pacman.conf
 fi
 
-# Install additional packages
-pacman -S $EXTRA_PACKAGES
-
 # Install grub bootloader 
 if [[ ! -d /boot/efi ]]; then
   mkdir -p /boot/efi
