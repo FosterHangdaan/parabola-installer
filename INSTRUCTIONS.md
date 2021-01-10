@@ -1,9 +1,9 @@
 # Step 1: Prepare the installation disk
-You may choose to partition your installation disk with either an encrypted or unencrypted system (root) partition. Two layouts which have been tested are shown below.
+Partition, format and mount the installation disk. You may choose to partition your installation disk with either an encrypted or unencrypted system partition. Although other schemes may also work, only the two schemes shown below have been tested.
 
 **Note:** Replace `/dev/sda` with the appropriate block device.
 
-## Unencrypted root partition scheme
+## Scheme 1: Unencrypted root partition scheme
 This scheme uses a simple layout commonly used in Windows systems.
 
 ```
@@ -45,7 +45,7 @@ Device       Start        End    Sectors   Size Type
 # mount /dev/sda1 /mnt/boot/efi
 ```
 
-## Encrypted root partition scheme (LUKS on a partition)
+## Scheme 2: Encrypted root partition scheme (LUKS on a partition)
 This scheme uses a full system encryption with dm-crypt + LUKS. Refer [here](https://wiki.archlinux.org/index.php/Dm-crypt/Encrypting_an_Entire_System#LUKS_on_a_partition) for a detailed guide.
 
 ```
@@ -104,12 +104,14 @@ Device       Start        End    Sectors   Size Type
 ```
 
 # Step 2: Establish internet connection
-The DHCP service is enabled in the Parabola Live Environment by default and should have acquired the appropriate network settings automatically. Establishing the connection is as simple as setting the nameserver then using ping to test the connection.
+The DHCP service is enabled in the Parabola Live Environment by default and should have acquired the appropriate network settings automatically.
+
+**IMPORTANT:** Ensure that a nameserver has been set in `/etc/resolv.conf`. This is vital to the `chroot.sh` script since the contents of resolv.conf is passed to the chroot environment. You can add a nameserver by executing the command below. Substitute the IP address with your preferred DNS server.
 ```
-echo 'nameserver 1.1.1.1' >> /etc/resolv.conf && ping -c 4 gnu.org
+# echo 'nameserver 1.1.1.1' >> /etc/resolv.conf
 ```
 
-A successful `ping` will have an output like the one below.
+Now test the connection by pinging a public server: `ping -c 4 gnu.org`. A successful `ping` will have an output like the one below.
 ```
 PING gnu.org (209.51.188.148) 56(84) bytes of data.
 64 bytes from wildebeest.gnu.org (209.51.188.148): icmp_seq=1 ttl=53 time=36.8 ms
@@ -137,10 +139,10 @@ Otherwise you will have to clone the repository.
 # cd parabola-installer
 # ./run.sh
 ```
-**Note:** If git is not installed then, then install it with `pacstrap -Sy git`.
+**Note:** If git is not installed, then install it with `pacstrap -Sy git`.
 
 # Step 4: Last Steps
-Perform the steps below after the script finishes. By default, the installation disk is mounted on '/mnt'.
+Perform the steps below after the script finishes. By default, the installation disk is mounted on `/mnt` and the name of the crypt device is `cryptroot`.
 
 1. Configure pacman in /mnt/etc/pacman.conf and enable the repositories you need.
 2. Unmount the installation disk `umount -R /mnt`
