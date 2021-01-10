@@ -1,16 +1,14 @@
 #!/usr/bin/env bash
 
-# Sanity Checks
+WORKDIR=$(dirname $0)
+cd $WORKDIR
+source settings.cfg
+
+# Initial Sanity Checks
 # --------------------------------------------------------------
-# Check if root
+# Check if root.
 if [[ $UID -ne 0 ]]; then
 	echo "ERROR: This script requires root privileges. Exiting..."
-	exit 1
-fi
-
-# Check if init system is SystemD
-if [[ $(ps --no-headers -o comm 1) != "systemd" ]]; then
-	echo "ERROR: Init system is not SystemD. Exiting..."
 	exit 1
 fi
 
@@ -20,11 +18,26 @@ if [[ ! -d /sys/firmware/efi/efivars ]]; then
 	exit 1
 fi
 
+# Check if the chosen init system is supported.
+if ! [[ $INIT_SYSTEM =~ ^(systemd|openrc)$ ]]; then
+	echo "ERROR: $INIT_SYSTEM is not supported. Please choose either openrc or systemd."
+	exit 1
+fi
+
 # Main
 # --------------------------------------------------------------
-WORKDIR=$(dirname $0)
-cd $WORKDIR
-source settings.cfg
+
+# Ensure that pacman is subscribed to the proper package repo
+# according to the chosen init system.
+if [[ $INIT_SYSTEM == 'systemd' ]]; then
+	# SystemD: Unsubscribe from nonsystemd repo
+	sed -i "s|^\[nonsystemd\]|#\[nonsystemd\]|" /etc/pacman.conf
+	sed -i "/\[nonsystemd\]/{n;s|^Include.*|#&|}" /etc/pacman.conf
+else
+	# OpenRC: Subscribe to nonsystemd repo
+	sed -i "s|^#\[nonsystemd\]|\[nonsystemd\]|" /etc/pacman.conf
+	sed -i "/\[nonsystemd\]/{n;s|^#||}" /etc/pacman.conf
+fi
 
 # Sync System Clock
 timedatectl set-ntp true
@@ -38,7 +51,11 @@ yes | pacman -U https://www.parabola.nu/packages/core/i686/archlinux32-keyring-t
 echo "$(awk -v "var=Server = $MIRROR" '/^Server \= *./ && !x {print var; x=1} 1' /etc/pacman.d/mirrorlist)" > /etc/pacman.d/mirrorlist
 
 # Install base packages and kernel
-pacstrap $CHROOTDIR $BASE_PACKAGES $KERNEL
+if [[ $INIT_SYSTEM == 'systemd' ]]; then
+	pacstrap $CHROOTDIR $SYSTEMD_BASE_PACKAGES $SCRIPT_PACKAGES $EXTRA_PACKAGES $KERNEL
+else
+	pacstrap $CHROOTDIR $OPENRC_BASE_PACKAGES $SCRIPT_PACKAGES $EXTRA_PACKAGES $KERNEL
+fi
 
 # Create the proper automount configuration
 genfstab -Up $CHROOTDIR >> ${CHROOTDIR}/etc/fstab

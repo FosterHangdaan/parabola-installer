@@ -6,7 +6,7 @@ The purpose of this project is to automate the procedures in the [Parabola insta
 # Requirements
 - Basic proficiency with GNU/Linux and it's command line interface.
 - UEFI compatible computer (The vast majority of modern motherboards support this)
-- Parabola CLI/Desktop ISO (SystemD variant)
+- Parabola CLI/Desktop ISO
 - Only wired networking is supported. If wireless networking is desired, a manual setup is required.
 - A copy of this repository on a USB (optional)
 

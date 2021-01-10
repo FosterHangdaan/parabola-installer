@@ -5,7 +5,11 @@ source settings.cfg
 
 # Set hostname
 sed "s|HOSTNAME|${HOSTNAME}|" etc/hosts.txt >> /etc/hosts
-echo $HOSTNAME > /etc/hostname
+if [[ $INIT_SYSTEM == 'systemd' ]]; then
+	echo $HOSTNAME > /etc/hostname
+else
+	echo "hostname=$HOSTNAME" > /etc/conf.d/hostname
+fi
 
 # Set locales and keymap
 sed "s|LANG_VAR|$LCLANG|; s|TIME_VAR|$LCTIME|" etc/locale.conf > /etc/locale.conf
@@ -37,9 +41,6 @@ passwd $USERNAME
 echo 'Enter the password for root'
 passwd root
 
-# Install packages
-yes | pacman -S sudo efibootmgr dosfstools os-prober mtools
-
 # Install grub bootloader 
 if [[ ! -d /boot/efi ]]; then
   mkdir -p /boot/efi
@@ -50,7 +51,7 @@ grub-mkconfig -o /boot/grub/grub.cfg
 # Allow wheel group to execute sudo commands
 sed -i "s|^# %wheel ALL=(ALL) ALL|%wheel ALL=(ALL) ALL|" /etc/sudoers
 
-# Enable Network Manager
-if [[ $BASE_PACKAGES == *"networkmanager"* ]]; then
-	systemctl enable NetworkManager
+# Enable Network Manager if it was installed.
+if pacman -Qi networkmanager 1>/dev/null 2>&1; then
+	[[ $INIT_SYSTEM == 'systemd' ]] && systemctl enable NetworkManager || rc-update add NetworkManager default
 fi
