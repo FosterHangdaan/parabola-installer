@@ -39,9 +39,16 @@ else
 	sed -i "/\[nonsystemd\]/{n;s|^#||}" /etc/pacman.conf
 fi
 
-# Sync System Clock
-timedatectl set-ntp true
-timedatectl set-timezone "$TZ"
+# Ensure system clock is synchronized.
+if command -v timedatectl > /dev/null; then
+	timedatectl set-timezone "$TZ"
+	timedatectl set-ntp true
+else
+	# Sync time the old-fashioned way and force a refresh.
+	ln -sf /usr/share/zoneinfo/$TZ /etc/localtime
+	yes | pacman -Sy ntp
+	ntpd -qg
+fi
 
 # Verify Package signatures
 yes | pacman -Sy archlinux-keyring archlinuxarm-keyring parabola-keyring
