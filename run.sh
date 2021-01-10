@@ -59,9 +59,9 @@ echo "$(awk -v "var=Server = $MIRROR" '/^Server \= *./ && !x {print var; x=1} 1'
 
 # Install base packages and kernel
 if [[ $INIT_SYSTEM == 'systemd' ]]; then
-	pacstrap $CHROOTDIR $SYSTEMD_BASE_PACKAGES $SCRIPT_PACKAGES $EXTRA_PACKAGES $KERNEL
+	pacstrap $CHROOTDIR $SYSTEMD_BASE_PACKAGES $SCRIPT_PACKAGES $KERNEL
 else
-	pacstrap $CHROOTDIR $OPENRC_BASE_PACKAGES $SCRIPT_PACKAGES $EXTRA_PACKAGES $KERNEL
+	pacstrap $CHROOTDIR $OPENRC_BASE_PACKAGES $SCRIPT_PACKAGES $KERNEL
 fi
 
 # Create the proper automount configuration

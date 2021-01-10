@@ -41,6 +41,21 @@ passwd $USERNAME
 echo 'Enter the password for root'
 passwd root
 
+# Ensure that pacman is subscribed to the proper package repo
+# according to the chosen init system.
+if [[ $INIT_SYSTEM == 'systemd' ]]; then
+	# SystemD: Unsubscribe from nonsystemd repo
+	sed -i "s|^\[nonsystemd\]|#\[nonsystemd\]|" /etc/pacman.conf
+	sed -i "/\[nonsystemd\]/{n;s|^Include.*|#&|}" /etc/pacman.conf
+else
+	# OpenRC: Subscribe to nonsystemd repo
+	sed -i "s|^#\[nonsystemd\]|\[nonsystemd\]|" /etc/pacman.conf
+	sed -i "/\[nonsystemd\]/{n;s|^#||}" /etc/pacman.conf
+fi
+
+# Install additional packages
+pacman -S $EXTRA_PACKAGES
+
 # Install grub bootloader 
 if [[ ! -d /boot/efi ]]; then
   mkdir -p /boot/efi
