@@ -1,9 +1,9 @@
 # Step 1: Prepare the installation disk
-Partition, format and mount the installation disk. You may choose to partition your installation disk with either an encrypted or unencrypted system partition. Although other schemes may also work, only the two schemes shown below have been tested.
+Partition, format and mount the installation disk. You may choose to partition your installation disk with either an encrypted or unencrypted system partition. Although other partition schemes may also work, only the two schemes shown below have been tested.
 
 **Note:** Replace `/dev/sda` with the appropriate block device.
 
-## Scheme 1: Unencrypted root partition scheme
+## Scheme 1: Unencrypted root partition
 This scheme uses a simple layout commonly used in Windows systems.
 
 ```
@@ -45,7 +45,7 @@ Device       Start        End    Sectors   Size Type
 # mount /dev/sda1 /mnt/boot/efi
 ```
 
-## Scheme 2: Encrypted root partition scheme (LUKS on a partition)
+## Scheme 2: Encrypted root partition (LUKS on a partition)
 This scheme uses a full system encryption with dm-crypt + LUKS. Refer [here](https://wiki.archlinux.org/index.php/Dm-crypt/Encrypting_an_Entire_System#LUKS_on_a_partition) for a detailed guide.
 
 ```
