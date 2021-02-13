@@ -50,11 +50,11 @@ fi
 mkinitcpio -p $KERNEL
 
 # Setup admin user and root
+echo ''
 colorEcho 'green' 'USER SETUP'
 colorEcho 'green' '----------'
 useradd -m --uid $USERID $USERNAME
 usermod -aG wheel,audio,video,optical,storage $USERNAME
-echo ''
 colorEcho 'green' "Enter the password for user ${USERNAME}"
 passwd $USERNAME
 echo ''
