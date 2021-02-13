@@ -3,24 +3,25 @@
 WORKDIR=$(dirname $0)
 cd $WORKDIR
 source settings.cfg
+source color-echo.sh
 
 # Initial Sanity Checks
 # --------------------------------------------------------------
 # Check if root.
 if [[ $UID -ne 0 ]]; then
-	echo "ERROR: This script requires root privileges. Exiting..."
+	colorEcho 'red' "ERROR: This script requires root privileges. Exiting..."
 	exit 1
 fi
 
 # Check UEFI support.
 if [[ ! -d /sys/firmware/efi/efivars ]]; then
-	echo "ERROR: UEFI is not enabled in this system. Exiting..."
+	colorEcho 'red' "ERROR: UEFI is not enabled in this system. Exiting..."
 	exit 1
 fi
 
 # Check if the chosen init system is supported.
 if ! [[ $INIT_SYSTEM =~ ^(systemd|openrc)$ ]]; then
-	echo "ERROR: $INIT_SYSTEM is not supported. Please choose either openrc or systemd."
+	colorEcho 'red' "ERROR: $INIT_SYSTEM is not supported. Please choose either openrc or systemd."
 	exit 1
 fi
 
@@ -77,10 +78,10 @@ arch-chroot $CHROOTDIR /parabola-installer/chroot.sh
 rm -rf ${CHROOTDIR}/parabola-installer
 
 echo ''
-echo 'INSTALLATION COMPLETE'
-echo '---------------------'
-echo 'Final steps:'
-echo "1: Configure pacman in ${CHROOTDIR}/etc/pacman.conf and enable the repositories you need."
-echo "2: Unmount the installation disk 'umount -R ${CHROOTDIR}'"
-echo "3: If you created an encrypted root partition, then close the mapping using 'cryptsetup close cryptroot'"
-echo "4: Reboot the system."
+colorEcho 'green' 'INSTALLATION COMPLETE'
+colorEcho 'green' '---------------------'
+colorEcho 'green' 'Final steps:'
+colorEcho 'green' "1: Configure pacman in ${CHROOTDIR}/etc/pacman.conf and enable the repositories you need."
+colorEcho 'green' "2: Unmount the installation disk 'umount -R ${CHROOTDIR}'"
+colorEcho 'green' "3: If you created an encrypted root partition, then close the mapping using 'cryptsetup close cryptroot'"
+colorEcho 'green' "4: Reboot the system."

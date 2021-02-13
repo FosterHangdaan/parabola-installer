@@ -2,6 +2,7 @@
 
 cd $(dirname $0)
 source settings.cfg
+source color-echo.sh
 
 # Ensure that pacman is subscribed to the proper package repo
 # according to the chosen init system.
@@ -49,12 +50,17 @@ fi
 mkinitcpio -p $KERNEL
 
 # Setup admin user and root
+colorEcho 'green' 'USER SETUP'
+colorEcho 'green' '----------'
 useradd -m --uid $USERID $USERNAME
 usermod -aG wheel,audio,video,optical,storage $USERNAME
-echo "Enter the password for user ${USERNAME}"
+echo ''
+colorEcho 'green' "Enter the password for user ${USERNAME}"
 passwd $USERNAME
-echo 'Enter the password for root'
+echo ''
+colorEcho 'green' 'Enter the password for root'
 passwd root
+echo ''
 
 # Install grub bootloader 
 if [[ ! -d /boot/efi ]]; then
